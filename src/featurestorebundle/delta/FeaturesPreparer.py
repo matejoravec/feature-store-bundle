@@ -3,8 +3,10 @@ from featurestorebundle.feature.FeaturesStorage import FeaturesStorage
 
 
 class FeaturesPreparer:
+    def __init__(self, join_batch_size: int):
+        self.__join_batch_size = join_batch_size
+
     def prepare(self, features_storage: FeaturesStorage) -> DataFrame:
-        join_batch_size = 10
         batch_counter = 0
 
         if not features_storage.results:
@@ -27,8 +29,8 @@ class FeaturesPreparer:
 
             joined_df = joined_df.join(df, on=pk_columns, how="left")
 
-            if batch_counter == join_batch_size:
-                joined_df = joined_df.persist()
+            if batch_counter == self.__join_batch_size:
+                joined_df = joined_df.checkpoint()
                 batch_counter = 0
 
         return joined_df

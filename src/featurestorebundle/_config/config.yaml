@@ -12,6 +12,9 @@ parameters:
     metadata_api:
       enabled: False
       url:
+    orchestration:
+      features_join:
+        batch_size: 5
 
 services:
   featurestorebundle.logger:
@@ -31,6 +34,8 @@ services:
       - {name: 'feature.writer', alias: 'delta'}
 
   featurestorebundle.delta.FeaturesPreparer:
+    arguments:
+      - '%featurestorebundle.orchestration.features_join.batch_size%'
 
   featurestorebundle.feature.EmptyTableCreator:
 
