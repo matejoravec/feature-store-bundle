@@ -6,7 +6,6 @@ from daipecore.widgets.Widgets import Widgets
 from featurestorebundle.utils.DateParser import DateParser
 from featurestorebundle.entity.EntityGetter import EntityGetter
 from featurestorebundle.feature.FeatureStore import FeatureStore
-from featurestorebundle.notebook.services.TimestampAdder import TimestampAdder
 from featurestorebundle.widgets.WidgetsFactory import WidgetsFactory
 
 
@@ -17,14 +16,12 @@ class FeaturesGetter:
         date_parser: DateParser,
         entity_getter: EntityGetter,
         feature_store: FeatureStore,
-        timestamp_adder: TimestampAdder,
         widgets: Widgets,
     ):
         self.__logger = logger
         self.__date_parser = date_parser
         self.__entity_getter = entity_getter
         self.__feature_store = feature_store
-        self.__timestamp_adder = timestamp_adder
         self.__widgets = widgets
 
     def get_features(self, feature_names: Optional[List[str]] = None):
@@ -42,8 +39,7 @@ class FeaturesGetter:
 
         self.__logger.info(f"Loading latest features for entity '{entity.name}'")
 
-        latest_df = self.__feature_store.get_latest(entity.name, features=feature_names, skip_incomplete_rows=True)
-        return self.__timestamp_adder.add_without_filters(latest_df, entity)
+        return self.__feature_store.get_latest(entity.name, features=feature_names, skip_incomplete_rows=True)
 
     def __get_features_for_target(self, feature_names: List[str]):
         entity = self.__entity_getter.get()
@@ -53,7 +49,8 @@ class FeaturesGetter:
         target_time_shift = self.__widgets.get_value(WidgetsFactory.target_time_shift)
 
         self.__logger.info(
-            f"Getting entity '{entity.name}' features for target '{target_name}', from '{target_date_from}' to '{target_date_to}' with a shift of '{target_time_shift}'"
+            f"Getting entity '{entity.name}' features for target '{target_name}', from '{target_date_from}' to '{target_date_to}' "
+            f"with a shift of '{target_time_shift}'"
         )
 
         return self.__feature_store.get_for_target(

@@ -32,9 +32,10 @@ class LatestFeaturesFilterer:
             for datetime_, features in feature_groups.items()
         ]
         features_data = reduce(lambda df1, df2: df1.join(df2, on=id_column, how="outer"), dataframes)
-        features_data = self.__incomplete_rows_handler.handle(features_data, skip_incomplete_rows).select(id_column, *features)
+        features_data = features_data.withColumn(time_column, f.lit(timestamp))
+        features_data = self.__incomplete_rows_handler.handle(features_data, skip_incomplete_rows)
 
-        return features_data
+        return features_data.select(id_column, time_column, *features)
 
     def __group_features_with_same_compute_date(self, feature_list: FeatureList, timestamp: datetime) -> Dict[datetime, List[str]]:
         feature_groups = {}
